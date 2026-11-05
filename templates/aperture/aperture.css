@@ -667,6 +667,14 @@ body.aperture .jp-RenderedText pre {
   overflow-x: auto;
 }
 
+/* Gráficas: se ajustan al ancho de la tarjeta */
+body.aperture .jp-OutputArea-output img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 0 auto;
+}
+
 /* Salidas markdown/HTML dentro de la tarjeta */
 body.aperture .jp-OutputArea-output.jp-RenderedHTMLCommon,
 body.aperture .jp-OutputArea-output .jp-RenderedHTMLCommon {
