@@ -1,0 +1,839 @@
+/* ==========================================================================
+   aperture.css
+   Estética de la charla "Monte Carlo, de la bomba atómica a las finanzas"
+   Semillero Aperture · Jose Miguel García Vélez
+
+   Retro terminal / pixel art: plano, bordes nítidos, sin sombras ni degradados.
+   Se carga después de los estilos de la plantilla "lab" de nbconvert.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. Tokens
+   -------------------------------------------------------------------------- */
+:root {
+  --ap-bg: #F4F7FA;          /* fondo principal */
+  --ap-bg-alt: #EAF1F5;      /* bloques de código */
+  --ap-card: #FFFFFF;        /* tarjetas y salidas */
+  --ap-line: #DCE4EA;        /* bordes */
+  --ap-ink: #0F1B2A;         /* texto principal */
+  --ap-muted: #4A6072;       /* texto secundario y notas */
+  --ap-teal: #0E7C86;        /* acento principal */
+  --ap-cyan: #5BD3E6;        /* cian claro */
+  --ap-amber: #E5A50A;       /* ámbar para resaltar */
+  --ap-amber-dark: #9A6700;  /* ámbar oscuro para cifras en texto */
+  --ap-coral: #E8685A;       /* negativos / advertencias */
+  --ap-dot: #C5D0DA;         /* puntos de la cuadrícula */
+
+  --ap-font-pixel: 'Pixelify Sans', 'Courier New', monospace;
+  --ap-font-mono: 'JetBrains Mono', 'Courier New', monospace;
+  --ap-radius: 8px;
+  --ap-max: 1100px;
+
+  /* Variables de JupyterLab que usa la plantilla base */
+  --jp-content-font-family: var(--ap-font-mono);
+  --jp-code-font-family: var(--ap-font-mono);
+  --jp-code-font-family-default: var(--ap-font-mono);
+  --jp-ui-font-family: var(--ap-font-mono);
+  --jp-content-heading-font-weight: 600;
+  --jp-content-font-size1: 15px;
+  --jp-code-font-size: 14px;
+  --jp-code-line-height: 1.6;
+  --jp-content-line-height: 1.7;
+  --jp-content-font-color0: var(--ap-ink);
+  --jp-content-font-color1: var(--ap-ink);
+  --jp-content-font-color2: var(--ap-muted);
+  --jp-content-font-color3: var(--ap-muted);
+  --jp-content-link-color: var(--ap-teal);
+  --jp-ui-font-color0: var(--ap-ink);
+  --jp-ui-font-color1: var(--ap-ink);
+  --jp-ui-font-color2: var(--ap-muted);
+  --jp-layout-color0: var(--ap-bg);
+  --jp-layout-color1: var(--ap-bg);
+  --jp-layout-color2: var(--ap-bg-alt);
+  --jp-cell-editor-background: var(--ap-bg-alt);
+  --jp-cell-editor-border-color: var(--ap-bg-alt);
+  --jp-border-color0: var(--ap-line);
+  --jp-border-color1: var(--ap-line);
+  --jp-border-color2: var(--ap-line);
+  --jp-rendered-html-border-color: var(--ap-line);
+  --jp-cell-prompt-width: 0px;
+  --jp-cell-padding: 0px;
+  --jp-elevation-z0: none;
+  --jp-elevation-z1: none;
+  --jp-elevation-z2: none;
+}
+
+/* --------------------------------------------------------------------------
+   2. Página: fondo con cuadrícula de puntos y contenedor centrado
+   -------------------------------------------------------------------------- */
+html {
+  background-color: var(--ap-bg);
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body.jp-Notebook.aperture {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  background-color: var(--ap-bg);
+  /* Cuadrado de 3x3 px en #C5D0DA centrado en una celda de 32 px */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' shape-rendering='crispEdges'%3E%3Crect x='14.5' y='14.5' width='3' height='3' fill='%23C5D0DA'/%3E%3C/svg%3E");
+  background-size: 32px 32px;
+  background-repeat: repeat;
+  color: var(--ap-ink);
+  font-family: var(--ap-font-mono);
+  font-size: 15px;
+  line-height: 1.7;
+  counter-reset: ap-section;
+}
+
+body.aperture ::selection {
+  background: var(--ap-cyan);
+  color: var(--ap-ink);
+}
+
+body.aperture > main,
+.aperture-header,
+.aperture-footer {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: var(--ap-max);
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 64px;
+  padding-right: 64px;
+}
+
+body.aperture > main {
+  padding-top: 8px;
+  padding-bottom: 48px;
+}
+
+/* --------------------------------------------------------------------------
+   3. Cabecera y pie
+   -------------------------------------------------------------------------- */
+.aperture-header {
+  padding-top: 56px;
+  padding-bottom: 8px;
+}
+
+.aperture-eyebrow,
+body.aperture .jp-RenderedHTMLCommon h2::before {
+  font-family: var(--ap-font-mono);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.4;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--ap-teal);
+}
+
+.aperture-eyebrow {
+  display: inline-block;
+  padding-left: 14px;
+  border-left: 6px solid var(--ap-amber);
+}
+
+.aperture-footer {
+  padding-top: 20px;
+  padding-bottom: 48px;
+  font-family: var(--ap-font-mono);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.aperture-footer::before {
+  content: "";
+  display: block;
+  height: 2px;
+  margin-bottom: 20px;
+  background: var(--ap-line);
+}
+
+.aperture-footer strong {
+  font-weight: 700;
+  color: var(--ap-ink);
+}
+
+.aperture-footer-sep {
+  margin: 0 10px;
+  color: var(--ap-amber);
+  font-weight: 700;
+}
+
+.aperture-footer-nb {
+  color: var(--ap-muted);
+  overflow-wrap: anywhere;
+}
+
+/* --------------------------------------------------------------------------
+   4. Celdas: sin prompts In[ ] / Out[ ], sin colapsadores, todo plano
+   -------------------------------------------------------------------------- */
+body.aperture .jp-InputPrompt,
+body.aperture .jp-OutputPrompt,
+body.aperture .jp-Collapser {
+  display: none !important;
+}
+
+body.aperture .jp-Cell {
+  padding: 0;
+  margin: 0 0 24px 0;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+}
+
+body.aperture .jp-Cell-inputWrapper,
+body.aperture .jp-Cell-outputWrapper,
+body.aperture .jp-InputArea,
+body.aperture .jp-OutputArea-child {
+  display: block;
+  min-width: 0;
+  max-width: 100%;
+}
+
+body.aperture .jp-InputArea-editor,
+body.aperture .jp-OutputArea-output,
+body.aperture .jp-OutputArea-child .jp-OutputArea-output {
+  display: block;
+  margin-left: 0;
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* --------------------------------------------------------------------------
+   5. Celdas de markdown: directamente sobre el fondo
+   -------------------------------------------------------------------------- */
+body.aperture .jp-MarkdownCell .jp-RenderedHTMLCommon {
+  display: block;
+  width: 100%;
+}
+
+body.aperture .jp-RenderedHTMLCommon {
+  padding: 0;
+  font-family: var(--ap-font-mono);
+  font-size: 15px;
+  line-height: 1.7;
+  color: var(--ap-ink);
+  overflow-wrap: break-word;
+}
+
+body.aperture .jp-RenderedHTMLCommon h1,
+body.aperture .jp-RenderedHTMLCommon h2,
+body.aperture .jp-RenderedHTMLCommon h3 {
+  font-family: var(--ap-font-pixel);
+  font-weight: 600;
+  line-height: 1.1;
+  letter-spacing: 0;
+}
+
+body.aperture .jp-RenderedHTMLCommon h1 {
+  margin: 8px 0 24px;
+  font-size: 48px;
+  color: var(--ap-teal);
+}
+
+body.aperture .jp-RenderedHTMLCommon h2 {
+  margin: 48px 0 16px;
+  font-size: 34px;
+  color: var(--ap-ink);
+  counter-increment: ap-section;
+}
+
+/* Eyebrow sobre cada h2: "SECCIÓN 01", "SECCIÓN 02", ... */
+body.aperture .jp-RenderedHTMLCommon h2::before {
+  content: "Sección " counter(ap-section, decimal-leading-zero);
+  display: block;
+  margin-bottom: 10px;
+}
+
+body.aperture .jp-RenderedHTMLCommon h3 {
+  margin: 32px 0 12px;
+  font-size: 24px;
+  color: var(--ap-ink);
+}
+
+body.aperture .jp-RenderedHTMLCommon h4,
+body.aperture .jp-RenderedHTMLCommon h5,
+body.aperture .jp-RenderedHTMLCommon h6 {
+  margin: 24px 0 8px;
+  font-family: var(--ap-font-mono);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--ap-ink);
+}
+
+body.aperture .jp-RenderedHTMLCommon > :first-child {
+  margin-top: 0;
+}
+
+body.aperture .jp-RenderedHTMLCommon p,
+body.aperture .jp-RenderedHTMLCommon ul,
+body.aperture .jp-RenderedHTMLCommon ol {
+  margin: 0 0 14px;
+  max-width: 78ch;
+}
+
+body.aperture .jp-RenderedHTMLCommon li + li {
+  margin-top: 4px;
+}
+
+body.aperture .jp-RenderedHTMLCommon ul {
+  list-style: square;
+}
+
+body.aperture .jp-RenderedHTMLCommon li::marker {
+  color: var(--ap-teal);
+}
+
+body.aperture .jp-RenderedHTMLCommon strong {
+  font-weight: 700;
+  color: var(--ap-ink);
+}
+
+body.aperture .jp-RenderedHTMLCommon em {
+  color: var(--ap-ink);
+}
+
+body.aperture .jp-RenderedHTMLCommon a {
+  color: var(--ap-teal);
+  text-decoration: underline;
+  text-decoration-color: var(--ap-amber);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 3px;
+}
+
+body.aperture .jp-RenderedHTMLCommon a:hover {
+  background: var(--ap-cyan);
+  color: var(--ap-ink);
+}
+
+/* Resaltado en texto: subrayado ámbar plano */
+body.aperture .jp-RenderedHTMLCommon mark {
+  background: transparent;
+  color: var(--ap-ink);
+  box-shadow: inset 0 -0.45em 0 var(--ap-amber);
+}
+
+/* Notas y citas */
+body.aperture .jp-RenderedHTMLCommon blockquote {
+  margin: 0 0 16px;
+  padding: 12px 18px;
+  background: var(--ap-card);
+  border: 2px solid var(--ap-line);
+  border-left: 6px solid var(--ap-amber);
+  border-radius: var(--ap-radius);
+  color: var(--ap-muted);
+}
+
+body.aperture .jp-RenderedHTMLCommon blockquote > :last-child {
+  margin-bottom: 0;
+}
+
+body.aperture .jp-RenderedHTMLCommon hr {
+  height: 2px;
+  margin: 32px 0;
+  border: 0;
+  background: var(--ap-line);
+}
+
+/* Código en línea dentro del texto */
+body.aperture .jp-RenderedHTMLCommon :not(pre) > code {
+  padding: 1px 6px;
+  background: var(--ap-bg-alt);
+  border: 1px solid var(--ap-line);
+  border-radius: 4px;
+  font-family: var(--ap-font-mono);
+  font-size: 0.92em;
+  color: var(--ap-ink);
+}
+
+/* Bloques de código escritos en markdown */
+body.aperture .jp-RenderedHTMLCommon pre {
+  margin: 0 0 16px;
+  padding: 16px 20px;
+  background: var(--ap-bg-alt);
+  border: 0;
+  border-radius: var(--ap-radius);
+  overflow-x: auto;
+}
+
+body.aperture .jp-RenderedHTMLCommon pre code {
+  padding: 0;
+  background: transparent;
+  border: 0;
+  font-size: 14px;
+}
+
+/* Fórmulas de MathJax anchas: scroll propio */
+body.aperture .jp-RenderedHTMLCommon mjx-container[display="true"],
+body.aperture .jp-RenderedHTMLCommon .MathJax_Display {
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+/* --------------------------------------------------------------------------
+   5b. Índice "paso a paso" (markdown envuelto en <div class="aperture-pasos">)
+   -------------------------------------------------------------------------- */
+body.aperture .aperture-pasos h2 {
+  counter-increment: none;
+  margin-top: 16px;
+}
+
+body.aperture .aperture-pasos h2::before {
+  content: "Paso a paso";
+}
+
+body.aperture .aperture-pasos ol {
+  list-style: none;
+  counter-reset: ap-paso;
+  margin: 0 0 16px;
+  padding: 0;
+  max-width: none;
+}
+
+body.aperture .aperture-pasos li {
+  counter-increment: ap-paso;
+  position: relative;
+  margin: 0 0 8px;
+  padding: 10px 16px 10px 76px;
+  min-height: 48px;
+  box-sizing: border-box;
+  background: var(--ap-card);
+  border-left: 4px solid var(--ap-teal);
+  border-radius: 0 4px 4px 0;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--ap-muted);
+}
+
+body.aperture .aperture-pasos li + li {
+  margin-top: 0;
+}
+
+body.aperture .aperture-pasos li::before {
+  content: counter(ap-paso, decimal-leading-zero);
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 76px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--ap-font-mono);
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--ap-teal);
+}
+
+body.aperture .aperture-pasos li::marker {
+  content: none;
+}
+
+body.aperture .aperture-pasos li > strong,
+body.aperture .aperture-pasos li > strong + em {
+  font-family: var(--ap-font-pixel);
+  font-weight: 600;
+  font-size: 17px;
+  line-height: 1.3;
+  color: var(--ap-ink);
+}
+
+body.aperture .aperture-pasos li > strong + em {
+  font-style: normal;
+  color: var(--ap-muted);
+}
+
+/* Último paso resaltado en ámbar */
+body.aperture .aperture-pasos li:last-child {
+  background: color-mix(in srgb, var(--ap-amber) 18%, var(--ap-card));
+  border-left-color: var(--ap-amber);
+}
+
+body.aperture .aperture-pasos li:last-child::before,
+body.aperture .aperture-pasos li:last-child > strong {
+  color: var(--ap-amber-dark);
+}
+
+@media (max-width: 760px) {
+  body.aperture .aperture-pasos li {
+    padding-left: 56px;
+  }
+
+  body.aperture .aperture-pasos li::before {
+    width: 56px;
+    font-size: 18px;
+  }
+
+  body.aperture .aperture-pasos li > strong,
+  body.aperture .aperture-pasos li > strong + em {
+    font-size: 15px;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   6. Celdas de código: bloque #EAF1F5 con radio 8px
+   -------------------------------------------------------------------------- */
+body.aperture .jp-CodeCell .jp-InputArea-editor,
+body.aperture .jp-CodeCell .jp-Editor,
+body.aperture .jp-CodeCell .cm-editor {
+  background: var(--ap-bg-alt);
+  border: 0;
+  border-radius: var(--ap-radius);
+}
+
+body.aperture .jp-CodeCell .jp-InputArea-editor {
+  display: block;
+  width: 100%;
+  overflow: hidden;
+}
+
+body.aperture .jp-CodeCell .highlight {
+  background: transparent;
+}
+
+body.aperture .jp-CodeCell .jp-InputArea-editor .highlight pre,
+body.aperture .jp-CodeCell .cm-editor.cm-s-jupyter .highlight pre {
+  margin: 0;
+  padding: 16px 20px;
+  background: transparent;
+  font-family: var(--ap-font-mono);
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--ap-ink);
+  white-space: pre;
+  overflow-x: auto;
+}
+
+/* Etiqueta tipo terminal sobre cada bloque de código */
+body.aperture .jp-CodeCell .jp-InputArea-editor::before {
+  content: "> python";
+  display: block;
+  padding: 10px 20px 0;
+  font-family: var(--ap-font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--ap-muted);
+}
+
+/* --------------------------------------------------------------------------
+   7. Resaltado de sintaxis (clases de Pygments)
+   -------------------------------------------------------------------------- */
+body.aperture .highlight,
+body.aperture .highlight .n,
+body.aperture .highlight .nn,
+body.aperture .highlight .nx,
+body.aperture .highlight .p,
+body.aperture .highlight .w,
+body.aperture .highlight .nv,
+body.aperture .highlight .vc,
+body.aperture .highlight .vg,
+body.aperture .highlight .vi,
+body.aperture .highlight .vm {
+  color: var(--ap-ink);
+}
+
+/* Keywords y operadores con palabra: turquesa */
+body.aperture .highlight .k,
+body.aperture .highlight .kc,
+body.aperture .highlight .kd,
+body.aperture .highlight .kn,
+body.aperture .highlight .kp,
+body.aperture .highlight .kr,
+body.aperture .highlight .kt,
+body.aperture .highlight .ow {
+  color: var(--ap-teal);
+  font-weight: 700;
+}
+
+/* Funciones, clases, decoradores y built-ins: turquesa sin negrita */
+body.aperture .highlight .nf,
+body.aperture .highlight .fm,
+body.aperture .highlight .nc,
+body.aperture .highlight .nd,
+body.aperture .highlight .nb,
+body.aperture .highlight .bp {
+  color: var(--ap-teal);
+  font-weight: 400;
+}
+
+/* Operadores simbólicos */
+body.aperture .highlight .o {
+  color: var(--ap-muted);
+  font-weight: 400;
+}
+
+/* Strings: ámbar oscuro */
+body.aperture .highlight .s,
+body.aperture .highlight .sa,
+body.aperture .highlight .sb,
+body.aperture .highlight .sc,
+body.aperture .highlight .dl,
+body.aperture .highlight .sd,
+body.aperture .highlight .s1,
+body.aperture .highlight .s2,
+body.aperture .highlight .se,
+body.aperture .highlight .sh,
+body.aperture .highlight .si,
+body.aperture .highlight .sx,
+body.aperture .highlight .sr,
+body.aperture .highlight .ss {
+  color: var(--ap-amber-dark);
+  font-style: normal;
+  font-weight: 400;
+}
+
+/* Números: coral */
+body.aperture .highlight .m,
+body.aperture .highlight .mb,
+body.aperture .highlight .mf,
+body.aperture .highlight .mh,
+body.aperture .highlight .mi,
+body.aperture .highlight .il,
+body.aperture .highlight .mo {
+  color: var(--ap-coral);
+  font-weight: 700;
+}
+
+/* Comentarios: texto secundario */
+body.aperture .highlight .c,
+body.aperture .highlight .ch,
+body.aperture .highlight .cm,
+body.aperture .highlight .c1,
+body.aperture .highlight .cs,
+body.aperture .highlight .cp,
+body.aperture .highlight .cpf {
+  color: var(--ap-muted);
+  font-style: italic;
+}
+
+body.aperture .highlight .err {
+  color: var(--ap-coral);
+  border: 0;
+  background: transparent;
+}
+
+/* --------------------------------------------------------------------------
+   8. Salidas: tarjeta blanca, borde 2px, borde superior 6px turquesa
+   -------------------------------------------------------------------------- */
+body.aperture .jp-Cell-outputWrapper {
+  margin-top: 12px;
+}
+
+body.aperture .jp-OutputArea {
+  box-sizing: border-box;
+  background: var(--ap-card);
+  border: 2px solid var(--ap-line);
+  border-top: 6px solid var(--ap-teal);
+  border-radius: var(--ap-radius);
+  padding: 16px 20px;
+  overflow: hidden;
+}
+
+/* Sin salidas, sin tarjeta */
+body.aperture .jp-OutputArea:empty,
+body.aperture .jp-Cell-outputWrapper:not(:has(.jp-OutputArea-child)) {
+  display: none;
+}
+
+body.aperture .jp-OutputArea-child + .jp-OutputArea-child {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 2px dashed var(--ap-line);
+}
+
+body.aperture .jp-OutputArea-output {
+  padding: 0;
+  background: transparent;
+  overflow-x: auto;
+}
+
+body.aperture .jp-OutputArea-output pre,
+body.aperture .jp-RenderedText pre {
+  margin: 0;
+  padding: 0;
+  font-family: var(--ap-font-mono);
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--ap-ink);
+  background: transparent;
+  white-space: pre;
+  overflow-x: auto;
+}
+
+/* Salidas markdown/HTML dentro de la tarjeta */
+body.aperture .jp-OutputArea-output.jp-RenderedHTMLCommon,
+body.aperture .jp-OutputArea-output .jp-RenderedHTMLCommon {
+  padding: 0;
+}
+
+/* stderr y errores: advertencia coral */
+body.aperture .jp-OutputArea-output[data-mime-type="application/vnd.jupyter.stderr"] {
+  padding-left: 14px;
+  border-left: 6px solid var(--ap-coral);
+  background: transparent;
+}
+
+body.aperture .jp-OutputArea-output[data-mime-type="application/vnd.jupyter.stderr"] pre {
+  color: var(--ap-ink);
+}
+
+/* Colores ANSI de los tracebacks llevados a la paleta */
+body.aperture .ansi-red-fg,
+body.aperture .ansi-red-intense-fg { color: #B83A2E; }
+body.aperture .ansi-green-fg,
+body.aperture .ansi-green-intense-fg,
+body.aperture .ansi-cyan-fg,
+body.aperture .ansi-cyan-intense-fg,
+body.aperture .ansi-blue-fg,
+body.aperture .ansi-blue-intense-fg { color: var(--ap-teal); }
+body.aperture .ansi-yellow-fg,
+body.aperture .ansi-yellow-intense-fg { color: var(--ap-amber-dark); }
+
+/* --------------------------------------------------------------------------
+   9. Tablas (pandas y markdown)
+   -------------------------------------------------------------------------- */
+body.aperture .jp-RenderedHTMLCommon table {
+  border-collapse: collapse;
+  border-spacing: 0;
+  margin: 0 0 16px;
+  border: 2px solid var(--ap-line);
+  font-family: var(--ap-font-mono);
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--ap-ink);
+  table-layout: auto;
+  /* Tablas anchas: scroll horizontal propio */
+  display: block;
+  width: max-content;
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+body.aperture .jp-OutputArea .jp-RenderedHTMLCommon table {
+  margin-bottom: 0;
+}
+
+body.aperture .jp-RenderedHTMLCommon th,
+body.aperture .jp-RenderedHTMLCommon td {
+  padding: 8px 14px;
+  border: 1px solid var(--ap-line);
+  text-align: right;
+  vertical-align: middle;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Encabezado: turquesa con texto claro */
+body.aperture .jp-RenderedHTMLCommon thead th,
+body.aperture .jp-RenderedHTMLCommon thead td {
+  background: var(--ap-teal);
+  color: var(--ap-bg);
+  font-weight: 700;
+  border-color: var(--ap-teal);
+  border-bottom: 2px solid var(--ap-ink);
+}
+
+/* Filas alternas */
+body.aperture .jp-RenderedHTMLCommon tbody tr,
+body.aperture .jp-RenderedHTMLCommon tbody tr:nth-child(odd) {
+  background: var(--ap-card);
+}
+
+body.aperture .jp-RenderedHTMLCommon tbody tr:nth-child(even) {
+  background: var(--ap-bg);
+}
+
+body.aperture .jp-RenderedHTMLCommon tbody tr:hover {
+  background: var(--ap-bg-alt);
+}
+
+/* Índice de filas de pandas */
+body.aperture .jp-RenderedHTMLCommon tbody th {
+  color: var(--ap-ink);
+  font-weight: 700;
+  text-align: left;
+}
+
+/* Tablas de markdown: texto alineado a la izquierda salvo indicación */
+body.aperture .jp-MarkdownCell .jp-RenderedHTMLCommon td,
+body.aperture .jp-MarkdownCell .jp-RenderedHTMLCommon th {
+  text-align: left;
+  white-space: normal;
+}
+
+body.aperture .jp-MarkdownCell .jp-RenderedHTMLCommon td[style*="right"],
+body.aperture .jp-MarkdownCell .jp-RenderedHTMLCommon th[style*="right"] {
+  text-align: right;
+}
+
+/* Pie de pandas ("5 rows × 3 columns") */
+body.aperture .jp-OutputArea-output .dataframe + p {
+  margin: 8px 0 0;
+  font-size: 12px;
+  color: var(--ap-muted);
+}
+
+/* --------------------------------------------------------------------------
+   10. Pantallas angostas
+   -------------------------------------------------------------------------- */
+@media (max-width: 760px) {
+  body.aperture > main,
+  .aperture-header,
+  .aperture-footer {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .aperture-header {
+    padding-top: 32px;
+  }
+
+  body.jp-Notebook.aperture,
+  body.aperture .jp-RenderedHTMLCommon {
+    font-size: 14px;
+  }
+
+  body.aperture .jp-RenderedHTMLCommon h1 { font-size: 34px; }
+  body.aperture .jp-RenderedHTMLCommon h2 { font-size: 26px; margin-top: 36px; }
+  body.aperture .jp-RenderedHTMLCommon h3 { font-size: 20px; }
+
+  body.aperture .aperture-eyebrow,
+  body.aperture .jp-RenderedHTMLCommon h2::before {
+    letter-spacing: 3px;
+  }
+
+  body.aperture .jp-CodeCell .jp-InputArea-editor .highlight pre,
+  body.aperture .jp-CodeCell .cm-editor.cm-s-jupyter .highlight pre,
+  body.aperture .jp-OutputArea-output pre {
+    font-size: 13px;
+  }
+
+  body.aperture .jp-CodeCell .jp-InputArea-editor .highlight pre,
+  body.aperture .jp-CodeCell .cm-editor.cm-s-jupyter .highlight pre {
+    padding: 14px 16px;
+  }
+
+  body.aperture .jp-OutputArea {
+    padding: 14px 16px;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   11. Impresión / PDF
+   -------------------------------------------------------------------------- */
+@media print {
+  body.jp-Notebook.aperture {
+    background-image: none;
+  }
+
+  body.aperture .jp-Cell {
+    break-inside: avoid;
+  }
+}

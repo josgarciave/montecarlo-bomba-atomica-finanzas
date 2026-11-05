@@ -1,0 +1,33 @@
+{#- Plantilla nbconvert "aperture": estética de la charla
+    "Monte Carlo, de la bomba atómica a las finanzas" (Semillero Aperture).
+    Hereda de la plantilla "lab" y solo cambia la presentación. -#}
+{%- extends 'lab/index.html.j2' -%}
+
+{% block extra_css %}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,700;1,400&family=Pixelify+Sans:wght@600&display=swap">
+{% endblock extra_css %}
+
+{% block notebook_css %}
+{{ super() }}
+{{ resources.include_css("aperture.css") }}
+{% endblock notebook_css %}
+
+{%- block body_header -%}
+<body class="jp-Notebook aperture" data-jp-theme-light="true" data-jp-theme-name="JupyterLab Light">
+<header class="aperture-header">
+  <span class="aperture-eyebrow">Jose Miguel García Vélez</span>
+</header>
+<main>
+{%- endblock body_header -%}
+
+{% block body_footer %}
+</main>
+<footer class="aperture-footer">
+  <strong>Semillero Aperture</strong>
+  <span class="aperture-footer-sep" aria-hidden="true">·</span>
+  <span class="aperture-footer-nb">{{ resources['metadata']['name'] | escape_html_keep_quotes }}</span>
+</footer>
+</body>
+{% endblock body_footer %}
