@@ -32,6 +32,31 @@ jupyter nbconvert --to html --execute --template aperture --TemplateExporter.ext
 
 `--execute` corre cada notebook antes de exportarlo para que el HTML incluya los resultados. En Windows, si `jupyter` no está en el PATH, usar `python -m jupyter nbconvert ...`. Los HTML quedan en `html/`.
 
+### Ver los HTML
+
+La estética de la charla solo se ve en el HTML exportado, abierto en el navegador (no dentro de Jupyter ni del editor de VS Code). Para abrir cada notebook:
+
+```bash
+# Windows (PowerShell)
+start html/01_var.html
+start html/02_opciones.html
+
+# macOS
+open html/01_var.html
+
+# Linux
+xdg-open html/01_var.html
+```
+
+Si en Windows los `.html` se abren con otra aplicación (por ejemplo Word), se puede forzar el navegador desde PowerShell:
+
+```powershell
+Start-Process chrome (Resolve-Path html/01_var.html).Path
+```
+
+O cambiar la aplicación predeterminada en Configuración → Aplicaciones → Aplicaciones predeterminadas → `.html`.
+
+
 ## Estructura
 
 ```
