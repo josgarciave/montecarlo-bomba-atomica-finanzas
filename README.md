@@ -1,6 +1,6 @@
 # Monte Carlo, de la bomba atómica a las finanzas
 
-Material de la charla sobre el método Monte Carlo, desde su origen en el Proyecto Manhattan hasta sus aplicaciones en riesgo financiero y valoración de opciones.
+Material de la charla sobre el método Monte Carlo, desde su origen en el Proyecto Manhattan hasta sus aplicaciones en riesgo financiero, valoración de opciones y pensiones.
 
 Por Jose Miguel García Vélez, estudiante de Estadística en la Universidad Nacional de Colombia.
 
@@ -10,6 +10,7 @@ Por Jose Miguel García Vélez, estudiante de Estadística en la Universidad Nac
 |---|---|
 | `01_var.ipynb` | Valor en Riesgo (VaR) de un portafolio |
 | `02_opciones.ipynb` | Valoración de opciones por simulación |
+| `03_pensiones.ipynb` | Simulación del ahorro pensional y probabilidad de alcanzar una meta |
 
 ## Cómo ejecutarlo
 
@@ -40,6 +41,7 @@ La estética de la charla solo se ve en el HTML exportado, abierto en el navegad
 # Windows (PowerShell)
 start html/01_var.html
 start html/02_opciones.html
+start html/03_pensiones.html
 
 # macOS
 open html/01_var.html
@@ -61,6 +63,7 @@ O cambiar la aplicación predeterminada en Configuración → Aplicaciones → A
 
 ```
 notebooks/            notebooks de la charla
+notebooks/graficas.py gráficas con la estética de la charla, usadas por los notebooks
 html/                 notebooks exportados a HTML
 templates/aperture/   plantilla de nbconvert con la estética de la charla
 figuras/              gráficas exportadas para las diapositivas
