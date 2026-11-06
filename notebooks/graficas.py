@@ -1,4 +1,4 @@
-"""Gráficas de los notebooks de VaR y de opciones con la estética de la charla (Semillero Aperture).
+"""Gráficas de los notebooks de VaR y de pensiones con la estética de la charla (Semillero Aperture).
 
 Uso desde el notebook:
 
@@ -6,7 +6,7 @@ Uso desde el notebook:
     graficas.aplicar_estilo()
     graficas.uniformes(U[:, 0])
 
-Las figuras del VaR se guardan como ``var_*.png`` y las de opciones como ``op_*.png``.
+Las figuras del VaR se guardan como ``var_*.png`` y las de pensiones como ``pen_*.png``.
 
 Cada función dibuja la figura, la guarda como PNG en ``figuras/`` (para las
 diapositivas) y la muestra.
@@ -145,18 +145,17 @@ def uniformes(u):
     _guardar_y_mostrar(fig, "var_01_uniformes")
 
 
-def normales(z, etiqueta="Simulado: norm.ppf(U)",
-             titulo="Transformada inversa: de uniformes a normales estándar", archivo="var_02_normales"):
+def normales(z):
     """Histograma de normales simuladas frente a la densidad N(0, 1)."""
     x = np.linspace(-4.5, 4.5, 400)
     fig, ax = plt.subplots(figsize=(9, 3.2))
-    _histograma(ax, z, etiqueta=etiqueta, bins=90, rango=(-4.5, 4.5))
+    _histograma(ax, z, etiqueta="Simulado: norm.ppf(U)", bins=90, rango=(-4.5, 4.5))
     ax.plot(x, stats.norm.pdf(x), color=AMBAR, label="N(0, 1) teórica")
     ax.set_xlabel("z")
     ax.set_ylabel("densidad")
-    ax.set_title(titulo)
+    ax.set_title("Transformada inversa: de uniformes a normales estándar")
     ax.legend(loc="upper right")
-    _guardar_y_mostrar(fig, archivo)
+    _guardar_y_mostrar(fig, "var_02_normales")
 
 
 def shocks_vs_historico(shocks, rendimientos: pd.Series, nombre="", horizonte=1):
@@ -280,98 +279,6 @@ def var_montecarlo(pnl, var, k, confianza, horizonte=1):
 
 
 # ---------------------------------------------------------------------------
-# Opciones
-# ---------------------------------------------------------------------------
-
-def precio_final(s_t, s0, r, sigma, t):
-    """Paso 02 (opciones): precios simulados al vencimiento frente a la lognormal teórica."""
-    s_t = np.asarray(s_t)
-    hasta = np.quantile(s_t, 0.999)
-    x = np.linspace(s_t.min(), hasta, 400)
-    teorica = stats.lognorm.pdf(x, s=sigma * np.sqrt(t), scale=s0 * np.exp((r - sigma**2 / 2) * t))
-
-    fig, ax = plt.subplots(figsize=(9, 3.4))
-    _histograma(ax, s_t, etiqueta="Simulado: S_T", bins=90, rango=(s_t.min(), hasta))
-    ax.plot(x, teorica, color=AMBAR, label="Lognormal teórica")
-    ax.axvline(s0, color=GRIS, linewidth=1)
-    ax.annotate(f"S₀ = {s0:,.2f}", (s0, ax.get_ylim()[1] * 0.92), xytext=(6, 0),
-                textcoords="offset points", fontsize=9)
-    ax.set_xlabel("precio al vencimiento (USD)")
-    ax.set_ylabel("densidad")
-    ax.set_title(f"{len(s_t):,} precios simulados al vencimiento")
-    ax.legend(loc="upper right")
-    _guardar_y_mostrar(fig, "op_02_precio_final")
-
-
-def _histograma_conteos(ax, conteos, bordes, color, etiqueta):
-    ax.stairs(conteos, bordes, color=color, linewidth=2, label=etiqueta)
-    ax.stairs(conteos, bordes, fill=True, color=color, alpha=0.15)
-
-
-def pagos(s_t, k):
-    """Paso 03 (opciones): qué escenarios terminan por encima del strike y pagan."""
-    s_t = np.asarray(s_t)
-    lo, hi = s_t.min(), np.quantile(s_t, 0.999)
-    ancho = (hi - lo) / 90
-    # Bordes alineados con K para que ninguna barra mezcle escenarios que pagan y que no
-    bordes = k + ancho * np.arange(np.floor((lo - k) / ancho), np.ceil((hi - k) / ancho) + 1)
-    no_pagan, _ = np.histogram(s_t[s_t <= k], bins=bordes)
-    pagan, _ = np.histogram(s_t[s_t > k], bins=bordes)
-    corte = np.searchsorted(bordes, k)
-    fraccion = (s_t > k).mean()
-    tope = max(no_pagan.max(), pagan.max())
-
-    fig, ax = plt.subplots(figsize=(9, 3.4))
-    _histograma_conteos(ax, no_pagan[:corte], bordes[:corte + 1], GRIS, "Pago = 0 (S_T ≤ K)")
-    _histograma_conteos(ax, pagan[corte:], bordes[corte:], TURQUESA, "Pago = S_T − K (S_T > K)")
-    ax.axvline(k, color=CORAL)
-    ax.annotate(f"K = {k:,.0f}", (k, tope * 1.08), xytext=(6, 0),
-                textcoords="offset points", fontsize=9)
-    ax.set_ylim(0, tope * 1.3)
-    ax.yaxis.set_major_formatter(usd)
-    ax.set_xlabel("precio al vencimiento (USD)")
-    ax.set_ylabel("escenarios")
-    ax.set_title(f"El {fraccion:.1%} de los escenarios termina por encima del strike y paga")
-    ax.legend(loc="upper right")
-    _guardar_y_mostrar(fig, "op_03_pagos")
-
-
-def convergencia(valores, porcentaje=False, etiqueta="Precio estimado con N escenarios",
-                 ylabel="precio (USD)", archivo="op_06_convergencia"):
-    """Paso 06: estimación (media de ``valores``) e intervalo del 95% según crece N.
-
-    Con ``porcentaje=True`` los valores son 0/1 y la media es una probabilidad.
-    """
-    d = np.asarray(valores, dtype=float)
-    n_total = len(d)
-    n = np.unique(np.logspace(2, np.log10(n_total), 300).astype(int))
-    media = np.cumsum(d)[n - 1] / n
-    var = (np.cumsum(d**2)[n - 1] - n * media**2) / (n - 1)
-    error = 1.96 * np.sqrt(var / n)
-    precio = d.mean()
-
-    fig, ax = plt.subplots(figsize=(9, 3.6))
-    ax.fill_between(n, media - error, media + error, color=TURQUESA, alpha=0.15, linewidth=0,
-                    label="Intervalo del 95%")
-    ax.plot(n, media, color=TURQUESA, label=etiqueta)
-    ax.axhline(precio, color=GRIS, linewidth=1, linestyle=(0, (4, 3)))
-    ax.plot(n_total, precio, "o", ms=8, color=TURQUESA, mec="white", mew=2, zorder=3)
-    texto = (f"{precio:.2%} ± {error[-1]:.2%}" if porcentaje
-             else f"USD {precio:,.2f} ± {error[-1]:,.2f}")
-    ax.annotate(texto, (n_total, precio), xytext=(-8, 14),
-                textcoords="offset points", ha="right", fontsize=9)
-    ax.set_xscale("log")
-    ax.xaxis.set_major_formatter(usd)
-    ax.set_xlabel("número de escenarios N (escala logarítmica)")
-    if porcentaje:
-        ax.yaxis.set_major_formatter(FuncFormatter(lambda y, _: f"{y:.0%}"))
-    ax.set_ylabel(ylabel)
-    ax.set_title("El error se reduce como 1/√N")
-    ax.legend(loc="lower right")
-    _guardar_y_mostrar(fig, archivo)
-
-
-# ---------------------------------------------------------------------------
 # Pensiones
 # ---------------------------------------------------------------------------
 
@@ -385,6 +292,11 @@ def _dinero(x, _=None):
 
 
 dinero = FuncFormatter(_dinero)
+
+
+def _histograma_conteos(ax, conteos, bordes, color, etiqueta):
+    ax.stairs(conteos, bordes, color=color, linewidth=2, label=etiqueta)
+    ax.stairs(conteos, bordes, fill=True, color=color, alpha=0.15)
 
 
 def rendimientos(r, mu, sigma):
@@ -451,7 +363,7 @@ def trayectorias(edades, saldos, meta, aportado, muestra=40):
     _guardar_y_mostrar(fig, "pen_04_trayectorias")
 
 
-def saldo_final(saldos_finales, meta):
+def saldo_final(saldos_finales, meta, edad=60):
     """Paso 05 (pensiones): distribución del saldo final (eje logarítmico) con percentiles y meta."""
     s = np.asarray(saldos_finales)
     bordes = np.logspace(np.log10(np.quantile(s, 0.001)), np.log10(np.quantile(s, 0.999)), 91)
@@ -472,7 +384,38 @@ def saldo_final(saldos_finales, meta):
     ax.xaxis.set_minor_formatter(FuncFormatter(lambda *_: ""))
     ax.yaxis.set_major_formatter(usd)
     ax.set_ylim(0, tope * 1.35)
-    ax.set_xlabel("saldo a los 55 años (US$ de hoy, escala logarítmica)")
+    ax.set_xlabel(f"saldo a los {edad} años (USD de hoy, escala logarítmica)")
     ax.set_ylabel("trayectorias")
     ax.set_title(f"Distribución del saldo final de {len(s):,} trayectorias")
     _guardar_y_mostrar(fig, "pen_05_saldo_final")
+
+
+def convergencia(llega):
+    """Paso 06 (pensiones): probabilidad estimada e intervalo del 95% según crece N.
+
+    ``llega`` vale 1 si la trayectoria alcanza la meta y 0 si no; su media es la probabilidad.
+    """
+    d = np.asarray(llega, dtype=float)
+    n_total = len(d)
+    n = np.unique(np.logspace(2, np.log10(n_total), 300).astype(int))
+    media = np.cumsum(d)[n - 1] / n
+    var = (np.cumsum(d**2)[n - 1] - n * media**2) / (n - 1)
+    error = 1.96 * np.sqrt(var / n)
+    p = d.mean()
+
+    fig, ax = plt.subplots(figsize=(9, 3.6))
+    ax.fill_between(n, media - error, media + error, color=TURQUESA, alpha=0.15, linewidth=0,
+                    label="Intervalo del 95%")
+    ax.plot(n, media, color=TURQUESA, label="Probabilidad estimada con N trayectorias")
+    ax.axhline(p, color=GRIS, linewidth=1, linestyle=(0, (4, 3)))
+    ax.plot(n_total, p, "o", ms=8, color=TURQUESA, mec="white", mew=2, zorder=3)
+    ax.annotate(f"{p:.2%} ± {error[-1]:.2%}", (n_total, p), xytext=(-8, 14),
+                textcoords="offset points", ha="right", fontsize=9)
+    ax.set_xscale("log")
+    ax.xaxis.set_major_formatter(usd)
+    ax.set_xlabel("número de trayectorias N (escala logarítmica)")
+    ax.yaxis.set_major_formatter(FuncFormatter(lambda y, _: f"{y:.0%}"))
+    ax.set_ylabel("probabilidad")
+    ax.set_title("El error se reduce como 1/√N")
+    ax.legend(loc="lower right")
+    _guardar_y_mostrar(fig, "pen_06_convergencia")

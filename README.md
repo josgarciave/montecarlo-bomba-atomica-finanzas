@@ -1,6 +1,6 @@
 # Monte Carlo, de la bomba atómica a las finanzas
 
-Material de la charla sobre el método Monte Carlo, desde su origen en el Proyecto Manhattan hasta sus aplicaciones en riesgo financiero, valoración de opciones y pensiones.
+Material de la charla sobre el método Monte Carlo, desde su origen en el Proyecto Manhattan hasta sus aplicaciones en riesgo financiero y pensiones.
 
 Por Jose Miguel García Vélez, estudiante de Estadística en la Universidad Nacional de Colombia.
 
@@ -9,8 +9,7 @@ Por Jose Miguel García Vélez, estudiante de Estadística en la Universidad Nac
 | Notebook | Tema |
 |---|---|
 | `01_var.ipynb` | Valor en Riesgo (VaR) de un portafolio |
-| `02_opciones.ipynb` | Valoración de opciones por simulación |
-| `03_pensiones.ipynb` | Simulación del ahorro pensional y probabilidad de alcanzar una meta |
+| `02_pensiones.ipynb` | Simulación del ahorro pensional y probabilidad de alcanzar una meta |
 
 ## Cómo ejecutarlo
 
@@ -40,8 +39,7 @@ La estética de la charla solo se ve en el HTML exportado, abierto en el navegad
 ```bash
 # Windows (PowerShell)
 start html/01_var.html
-start html/02_opciones.html
-start html/03_pensiones.html
+start html/02_pensiones.html
 
 # macOS
 open html/01_var.html
