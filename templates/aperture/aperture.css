@@ -387,6 +387,15 @@ body.aperture .aperture-pasos h2::before {
   content: "Paso a paso";
 }
 
+/* Conclusiones: h2 fuera de la numeración de secciones */
+body.aperture .aperture-cierre h2 {
+  counter-increment: none;
+}
+
+body.aperture .aperture-cierre h2::before {
+  content: "Cierre";
+}
+
 body.aperture .aperture-pasos ol {
   list-style: none;
   counter-reset: ap-paso;
