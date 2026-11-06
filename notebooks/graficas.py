@@ -336,9 +336,13 @@ def pagos(s_t, k):
     _guardar_y_mostrar(fig, "op_03_pagos")
 
 
-def convergencia(descontados):
-    """Paso 06 (opciones): estimación del precio e intervalo del 95% según crece N."""
-    d = np.asarray(descontados, dtype=float)
+def convergencia(valores, porcentaje=False, etiqueta="Precio estimado con N escenarios",
+                 ylabel="precio (USD)", archivo="op_06_convergencia"):
+    """Paso 06: estimación (media de ``valores``) e intervalo del 95% según crece N.
+
+    Con ``porcentaje=True`` los valores son 0/1 y la media es una probabilidad.
+    """
+    d = np.asarray(valores, dtype=float)
     n_total = len(d)
     n = np.unique(np.logspace(2, np.log10(n_total), 300).astype(int))
     media = np.cumsum(d)[n - 1] / n
@@ -349,15 +353,126 @@ def convergencia(descontados):
     fig, ax = plt.subplots(figsize=(9, 3.6))
     ax.fill_between(n, media - error, media + error, color=TURQUESA, alpha=0.15, linewidth=0,
                     label="Intervalo del 95%")
-    ax.plot(n, media, color=TURQUESA, label="Precio estimado con N escenarios")
+    ax.plot(n, media, color=TURQUESA, label=etiqueta)
     ax.axhline(precio, color=GRIS, linewidth=1, linestyle=(0, (4, 3)))
     ax.plot(n_total, precio, "o", ms=8, color=TURQUESA, mec="white", mew=2, zorder=3)
-    ax.annotate(f"USD {precio:,.2f} ± {error[-1]:,.2f}", (n_total, precio), xytext=(-8, 14),
+    texto = (f"{precio:.2%} ± {error[-1]:.2%}" if porcentaje
+             else f"USD {precio:,.2f} ± {error[-1]:,.2f}")
+    ax.annotate(texto, (n_total, precio), xytext=(-8, 14),
                 textcoords="offset points", ha="right", fontsize=9)
     ax.set_xscale("log")
     ax.xaxis.set_major_formatter(usd)
     ax.set_xlabel("número de escenarios N (escala logarítmica)")
-    ax.set_ylabel("precio (USD)")
+    if porcentaje:
+        ax.yaxis.set_major_formatter(FuncFormatter(lambda y, _: f"{y:.0%}"))
+    ax.set_ylabel(ylabel)
     ax.set_title("El error se reduce como 1/√N")
     ax.legend(loc="lower right")
-    _guardar_y_mostrar(fig, "op_06_convergencia")
+    _guardar_y_mostrar(fig, archivo)
+
+
+# ---------------------------------------------------------------------------
+# Pensiones
+# ---------------------------------------------------------------------------
+
+def _dinero(x, _=None):
+    """US$ abreviado: 250 k, 1.5 M."""
+    if abs(x) >= 1e6:
+        return f"{x / 1e6:,.1f} M".replace(".0 M", " M")
+    if abs(x) >= 1e3:
+        return f"{x / 1e3:,.0f} k"
+    return f"{x:,.0f}"
+
+
+dinero = FuncFormatter(_dinero)
+
+
+def rendimientos(r, mu, sigma):
+    """Paso 01 (pensiones): rendimientos anuales simulados frente a la normal N(μ, σ)."""
+    r = np.asarray(r).ravel() * 100
+    x = np.linspace(r.min(), r.max(), 400)
+    fig, ax = plt.subplots(figsize=(9, 3.4))
+    _histograma(ax, r, etiqueta="Simulado: R", bins=90, rango=(r.min(), r.max()))
+    ax.plot(x, stats.norm.pdf(x, mu * 100, sigma * 100), color=AMBAR, label=f"N({mu:.1%}, {sigma:.0%}) teórica")
+    ax.axvline(0, color=GRIS, linewidth=1)
+    negativos = (r < 0).mean()
+    ax.annotate(f"{negativos:.0%} de los años\ncon pérdidas", (0, ax.get_ylim()[1] * 0.85),
+                xytext=(-8, 0), textcoords="offset points", ha="right", fontsize=9)
+    ax.set_xlabel("rendimiento real anual (%)")
+    ax.set_ylabel("densidad")
+    ax.set_title(f"{r.size:,} rendimientos anuales simulados")
+    ax.legend(loc="upper right")
+    _guardar_y_mostrar(fig, "pen_01_rendimientos")
+
+
+def vida_laboral(edades, saldo, aportado, meta):
+    """Paso 03 (pensiones): una vida laboral simulada frente a lo aportado y la meta."""
+    fig, ax = plt.subplots(figsize=(9, 3.6))
+    ax.plot(edades, saldo, color=TURQUESA, label="Saldo de una trayectoria")
+    ax.plot(edades, aportado, color=AMBAR, label="Total aportado")
+    ax.axhline(meta, color=CORAL, linewidth=1.5, linestyle=(0, (4, 3)))
+    ax.annotate(f"Meta US$ {_dinero(meta)}", (edades[0], meta), xytext=(0, 6),
+                textcoords="offset points", fontsize=9)
+    ax.plot(edades[-1], saldo[-1], "o", ms=8, color=TURQUESA, mec="white", mew=2, zorder=3)
+    ax.annotate(f"US$ {_dinero(saldo[-1])}", (edades[-1], saldo[-1]), xytext=(0, 12),
+                textcoords="offset points", ha="right", fontsize=9)
+    ax.set_ylim(top=max(saldo.max(), meta) * 1.15)
+    ax.yaxis.set_major_formatter(dinero)
+    ax.set_xlabel("edad")
+    ax.set_ylabel("US$ de hoy")
+    ax.set_title("Una vida laboral: el saldo crece con los aportes y con el mercado")
+    ax.legend(loc="upper left")
+    _guardar_y_mostrar(fig, "pen_03_vida_laboral")
+
+
+def trayectorias(edades, saldos, meta, aportado, muestra=40):
+    """Paso 04 (pensiones): abanico de percentiles de N trayectorias y algunas de ejemplo."""
+    p5, p25, p50, p75, p95 = np.percentile(saldos, [5, 25, 50, 75, 95], axis=0)
+    fig, ax = plt.subplots(figsize=(9, 4))
+    for fila in saldos[:muestra]:
+        ax.plot(edades, fila, color=GRIS, linewidth=0.6, alpha=0.25)
+    ax.fill_between(edades, p5, p95, color=TURQUESA, alpha=0.12, linewidth=0, label="Percentiles 5–95")
+    ax.fill_between(edades, p25, p75, color=TURQUESA, alpha=0.25, linewidth=0, label="Percentiles 25–75")
+    ax.plot(edades, p50, color=TURQUESA, label="Mediana")
+    ax.plot(edades, aportado, color=AMBAR, label="Total aportado")
+    ax.axhline(meta, color=CORAL, linewidth=1.5, linestyle=(0, (4, 3)))
+    ax.annotate(f"Meta US$ {_dinero(meta)}", (edades[0], meta), xytext=(0, 6),
+                textcoords="offset points", fontsize=9)
+    for y, nombre in [(p95[-1], "P95"), (p50[-1], "P50"), (p5[-1], "P5")]:
+        ax.annotate(f"{nombre} {_dinero(y)}", (edades[-1], y), xytext=(6, 0),
+                    textcoords="offset points", va="center", fontsize=9)
+    ax.set_xlim(edades[0], edades[-1] + 3.5)
+    ax.set_ylim(0, p95[-1] * 1.1)
+    ax.yaxis.set_major_formatter(dinero)
+    ax.set_xlabel("edad")
+    ax.set_ylabel("US$ de hoy")
+    ax.set_title(f"{len(saldos):,} vidas laborales simuladas")
+    ax.legend(loc="upper left")
+    _guardar_y_mostrar(fig, "pen_04_trayectorias")
+
+
+def saldo_final(saldos_finales, meta):
+    """Paso 05 (pensiones): distribución del saldo final (eje logarítmico) con percentiles y meta."""
+    s = np.asarray(saldos_finales)
+    bordes = np.logspace(np.log10(np.quantile(s, 0.001)), np.log10(np.quantile(s, 0.999)), 91)
+    conteo, _ = np.histogram(s, bins=bordes)
+    fig, ax = plt.subplots(figsize=(9, 3.6))
+    _histograma_conteos(ax, conteo, bordes, TURQUESA, "Saldo final simulado")
+    tope = conteo.max()
+    for q in [5, 50, 95]:
+        v = np.percentile(s, q)
+        ax.axvline(v, color=GRIS, linewidth=1, linestyle=(0, (2, 2)))
+        ax.annotate(f"P{q}\n{_dinero(v)}", (v, tope * 1.12), xytext=(5, 0),
+                    textcoords="offset points", va="center", fontsize=9)
+    ax.axvline(meta, color=CORAL, linewidth=2)
+    ax.annotate(f"Meta\n{_dinero(meta)}", (meta, tope * 1.12), xytext=(-5, 0),
+                textcoords="offset points", ha="right", va="center", fontsize=9)
+    ax.set_xscale("log")
+    ax.xaxis.set_major_formatter(dinero)
+    ax.xaxis.set_minor_formatter(FuncFormatter(lambda *_: ""))
+    ax.yaxis.set_major_formatter(usd)
+    ax.set_ylim(0, tope * 1.35)
+    ax.set_xlabel("saldo a los 55 años (US$ de hoy, escala logarítmica)")
+    ax.set_ylabel("trayectorias")
+    ax.set_title(f"Distribución del saldo final de {len(s):,} trayectorias")
+    _guardar_y_mostrar(fig, "pen_05_saldo_final")
